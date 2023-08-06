@@ -7,13 +7,13 @@ exports.getMainPage = (req, res, next) => {
 };
 
 exports.addExpense = (req, res, next) => {
-   const amount = req.body.amount;
-   const description = req.body.description;
-   const category = req.body.category;
-   Expense.create({
+  const amount = req.body.amount;
+  const description = req.body.description;
+  const category = req.body.category;
+  Expense.create({
     description: description,
     amount: amount,
-    category:category,
+    category: category,
   })
     .then((result) => {
       console.log("Expense Added");
@@ -42,6 +42,25 @@ exports.deleteExpense = (req, res, next) => {
     })
     .then((result) => {
       console.log("Expense Deleted");
+      res.redirect("/");
+    })
+    .catch((err) => console.log(err));
+};
+
+exports.editExpense = (req, res, next) => {
+  const id = req.params.id;
+  console.log(req.body);
+  const category = req.body.category;
+  const description = req.body.description;
+  const amount = req.body.amount;
+  Expense.findByPk(id)
+    .then((expense) => {
+      expense.category = category;
+      expense.description = description;
+      expense.amount = amount;
+      return expense.save();
+    })
+    .then((result) => {
       res.redirect("/");
     })
     .catch((err) => console.log(err));

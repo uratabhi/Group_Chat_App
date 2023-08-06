@@ -24,7 +24,6 @@ async function getAllExpenses(){
         console.log(err);
     }
 }
-document.addEventListener("DOMContentLoaded", getAllExpenses);
 
 users.addEventListener("click", deleteExpense);
 async function deleteExpense(e){
@@ -40,3 +39,46 @@ async function deleteExpense(e){
         console.log(err);
      }
 }
+users.addEventListener('click', editExpense);
+async function editExpense(e){
+      try {
+         if(e.target.classList.contains("edit")){
+            let parentNode = e.target.parentElement;
+            const  id = parentNode.getAttribute('id');
+            const amount = document.getElementById('amount');
+            const description = document.getElementById('description');
+            const category = document.getElementById('choice');
+            const myBtn = document.querySelector('.btn');
+           // console.log(id);
+            const res = await axios.get(`http://localhost:3000/getAllExpenses`);
+            res.data.forEach((data)=>{
+                 if(data.id==id){
+                    amount.value = data.amount;
+                    description.value = data.description;
+                    category.value = data.category;
+                    myBtn.textContent = "Update";
+                    myBtn.addEventListener('click', async function update(e){
+                        e.preventDefault();
+                        console.log("request to backend for edit");
+                        const res = await axios.post(
+                          `http://localhost:3000/editExpense/${id}`,
+                          {
+                            category: category.value,
+                            description: description.value,
+                            amount: amount.value,
+                          }
+                        );
+            
+                        myBtn.removeEventListener("click", update);
+                        myBtn.textContent = "Add Expense";
+                        window.location.reload();
+                    });
+                 }
+            })
+         }
+      } catch (err) {
+         console.log(err);
+      }
+}
+
+document.addEventListener("DOMContentLoaded", getAllExpenses);
