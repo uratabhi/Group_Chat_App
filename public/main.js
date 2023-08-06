@@ -1,84 +1,86 @@
-var form = document.querySelector('#my-form');
-var users = document.getElementById('users');
+var users = document.getElementById("users");
+var users2 = document.getElementById("users2");
 
-async function getAllExpenses(){
-    try {
-        const res = await axios.get("http://localhost:3000/getAllExpenses");
-        res.data.forEach((data)=>{
-            const parentNode = document.getElementById('users');
-            const childNode = document.createElement('li');
-            childNode.setAttribute("id", data.id);
-            let del = document.createElement('button');
-            let edit = document.createElement('button');
-            del.className = 'delete';
-            edit.className = 'edit';
-            del.appendChild(document.createTextNode('delete'));
-            edit.appendChild(document.createTextNode('edit'));
-            var textToBePut = `${data.amount} - ${data.description} - ${data.category}`;
-             childNode.appendChild(document.createTextNode(textToBePut));
-             childNode.appendChild(edit);
-             childNode.appendChild(del);
-             parentNode.appendChild(childNode);
-        })
-    } catch (err) {
-        console.log(err);
+async function getAllTodos() {
+  try {
+    const res = await axios.get("http://localhost:3000/getAllTodos");
+    res.data.forEach((data) => {
+       if(data.isDone=="1"){
+        const parentNode = document.getElementById("users");
+        const childNode = document.createElement("li");
+        childNode.setAttribute("id", data.id);
+        let del = document.createElement("button");
+        let edit = document.createElement("button");
+        edit.className = "edit";
+        del.className = "delete";
+        edit.appendChild(document.createTextNode("\u2713"));
+        del.appendChild(document.createTextNode("X"));
+        var textToBePut = `${data.todoName} - ${data.description}`;
+        childNode.appendChild(document.createTextNode(textToBePut));
+        childNode.appendChild(edit);
+        childNode.appendChild(del);
+        parentNode.appendChild(childNode);
+       }
+       else{
+        const parentNode = document.getElementById("users2");
+        const childNode = document.createElement("li");
+        childNode.setAttribute("id", data.id);
+        let delbutton = document.createElement("button");
+        delbutton.className = "delete";
+        delbutton.appendChild(document.createTextNode("X"));
+        let textToBe = `${data.todoName} - ${data.description}`;
+        childNode.appendChild(document.createTextNode(textToBe));
+        childNode.appendChild(delbutton);
+        parentNode.appendChild(childNode);
+       }
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+users.addEventListener("click", deleteTodo);
+users2.addEventListener('click', deleteTodo);
+async function deleteTodo(e) {
+  try {
+    if (e.target.classList.contains("delete")) {
+      var parentNode = e.target.parentElement;
+      let id = parentNode.getAttribute("id");
+      console.log(id);
+      const deleteTodo = await axios.get(
+        `http://localhost:3000/deleteTodo/${id}`
+      );
+      window.location.reload();
     }
+  } catch (err) {
+    console.log(err);
+  }
 }
-
-users.addEventListener("click", deleteExpense);
-async function deleteExpense(e){
-     try {
-        if(e.target.classList.contains("delete")){
-            var parentNode = e.target.parentElement;
-            let id = parentNode.getAttribute('id');
-            console.log(id);
-            const deleteUser = await axios.get(`http://localhost:3000/deleteExpense/${id}`);
-            window.location.reload();
+users.addEventListener("click", tickTodo);
+async function tickTodo(e) {
+  try {
+    if (e.target.classList.contains("edit")) {
+      let parentNode = e.target.parentElement;
+      const id = parentNode.getAttribute("id");
+      const res = await axios.get("http://localhost:3000/getAllTodos");
+      res.data.forEach(async (data) => {
+        if (data.id == id) {
+          const todoname = data.todoName;
+          const description = data.description;
+          const res = await axios.post(
+            `http://localhost:3000/editTodo/${id}/0`,
+            {
+              todoName: todoname,
+              description: description,
+            }
+          );
+          window.location.reload();
         }
-     } catch (err) {
-        console.log(err);
-     }
-}
-users.addEventListener('click', editExpense);
-async function editExpense(e){
-      try {
-         if(e.target.classList.contains("edit")){
-            let parentNode = e.target.parentElement;
-            const  id = parentNode.getAttribute('id');
-            const amount = document.getElementById('amount');
-            const description = document.getElementById('description');
-            const category = document.getElementById('choice');
-            const myBtn = document.querySelector('.btn');
-           // console.log(id);
-            const res = await axios.get(`http://localhost:3000/getAllExpenses`);
-            res.data.forEach((data)=>{
-                 if(data.id==id){
-                    amount.value = data.amount;
-                    description.value = data.description;
-                    category.value = data.category;
-                    myBtn.textContent = "Update";
-                    myBtn.addEventListener('click', async function update(e){
-                        e.preventDefault();
-                        console.log("request to backend for edit");
-                        const res = await axios.post(
-                          `http://localhost:3000/editExpense/${id}`,
-                          {
-                            category: category.value,
-                            description: description.value,
-                            amount: amount.value,
-                          }
-                        );
-            
-                        myBtn.removeEventListener("click", update);
-                        myBtn.textContent = "Add Expense";
-                        window.location.reload();
-                    });
-                 }
-            })
-         }
-      } catch (err) {
-         console.log(err);
-      }
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
 }
 
-document.addEventListener("DOMContentLoaded", getAllExpenses);
+document.addEventListener("DOMContentLoaded", getAllTodos);

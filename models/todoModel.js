@@ -2,16 +2,16 @@ const Sequelize = require('sequelize');
 
 const sequelize = require('../utils/database');
 
-const Expense = sequelize.define('expenses', {
+const Todo = sequelize.define('todos', {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-    amount : Sequelize.INTEGER,
+    todoName : Sequelize.STRING,
     description : Sequelize.STRING,
-    category : Sequelize.STRING,
+    isDone : Sequelize.STRING,
 });
 
-module.exports = Expense;
+module.exports = Todo;

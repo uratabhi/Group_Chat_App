@@ -41,13 +41,6 @@
     display: block;
   }
   
-  #my-form input[type='number']{
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
   #my-form input[type='text'] {
     width: 100%;
     padding: 8px;
@@ -55,13 +48,9 @@
     border-radius: 5px;
     border: 1px solid #ccc;
   }
-  .main-selection{
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
+
+
+
   .btn {
     display: block;
     width: 100%;
@@ -107,7 +96,7 @@
       background: #21aa1c;
       color: #fff;
       border-radius: 5px;
-      margin: 0 1px;
+      margin: 0 2px;
   }
    .edit:hover{
     background-color: #28ec22;

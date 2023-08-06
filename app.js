@@ -4,13 +4,13 @@ const app = express();
 
 const bodyParser = require('body-parser');
 const sequelize = require('./utils/database');
-const expenseRouter = require('./routes/expenseRoutes');
+const todoRouter = require('./routes/todoRoutes');
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use("/", expenseRouter);
+app.use("/", todoRouter);
 sequelize
   .sync()
   .then((result) => {
