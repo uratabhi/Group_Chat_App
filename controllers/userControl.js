@@ -9,7 +9,7 @@ const generateAccessToken = (id, Email) => {
 };
 
 const getMainPage = (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../", "views", "signup.html"));
+  res.sendFile(path.join(__dirname, "../", "views", "login.html"));
 };
 
 
