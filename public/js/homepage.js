@@ -12,6 +12,7 @@ async function messageSendApi(e){
          const message = msgtextarea.value;
          const token = localStorage.getItem('token');
          const res = await axios.post("http://localhost:3000/chat/sendmessage", {message : message},  { headers: { Authorization: token } })
+         msgtextarea.value = "";
          console.log(res.data.message);
      } catch (error) {
         console.log('some error has occured.. Try after some time!!')
@@ -34,6 +35,7 @@ async function getMessagesApi(){
           const token = localStorage.getItem("token");
           const parsedToken = parseJwt(token);
           const userId = parsedToken.userId;
+          chathub.innerHTML = "";
           res.data.messages.forEach((data)=>{
               if(userId===data.userId){
                  const div1 = document.createElement("div");
@@ -66,5 +68,9 @@ async function getMessagesApi(){
           console.log('some error has occured');
        }
 }
+
+setInterval(() => {
+     getMessagesApi();
+}, 1000);
 
 document.addEventListener('DOMContentLoaded', getMessagesApi);
