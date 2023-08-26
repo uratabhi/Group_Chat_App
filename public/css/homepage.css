@@ -176,6 +176,10 @@ body{
     padding: 20px
 }
 
+#msgBtn:hover{
+     cursor: pointer;
+}
+
 .online,
 .offline,
 .me {
