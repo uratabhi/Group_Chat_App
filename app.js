@@ -4,9 +4,9 @@ const app = express();
 
 const bodyParser = require('body-parser');
 const sequelize = require('./utils/database');
-const todoRouter = require('./routes/todoRoutes');
+const todoRouter = require('./routes/userRoutes');
 
-
+app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
