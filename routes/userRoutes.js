@@ -7,6 +7,8 @@ router.get('/', userController.getMainPage);
 
 router.post('/signUp', userController.postUserSignUP);
 
+router.post('/login', userController.postUserLogin);
+
 
 
 

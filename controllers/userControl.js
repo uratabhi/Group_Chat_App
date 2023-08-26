@@ -1,6 +1,12 @@
 const path = require('path');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require("../models/userModel");
+
+
+const generateAccessToken = (id, Email) => {
+  return jwt.sign({ userId: id, Email: Email }, process.env.TOKEN);
+};
 
 const getMainPage = (req, res, next) => {
   res.sendFile(path.join(__dirname, "../", "views", "signup.html"));
@@ -47,6 +53,43 @@ const postUserSignUP = async (req, res, next) => {
 };
 
 
+const postUserLogin = async (req, res, next) => {
+  try {
+    const Email = req.body.loginEmail;
+    const Password = req.body.loginPassword;
+
+    const user = User.findOne({ where: { Email: Email } }).then((user) => {
+      if (user) {
+        bcrypt.compare(Password, user.Password, (err, result) => {
+          if (err) {
+            return res
+              .status(500)
+              .json({ success: false, message: "something  went wrong" });
+          }
+          if (result == true) {
+            return res.status(200).json({
+              success: true,
+              message: "Login Successful!",
+              token: generateAccessToken(user.id, user.email),
+            });
+          } else {
+            return res.status(401).json({
+              success: false,
+              message: "Password Incorrect!",
+            });
+          }
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: "User doesn't Exists!",
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 
 
@@ -61,6 +104,7 @@ const postUserSignUP = async (req, res, next) => {
 
 
 
-module.exports ={getMainPage, postUserSignUP};
+
+module.exports ={getMainPage, postUserSignUP, postUserLogin};
 
 
