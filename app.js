@@ -7,6 +7,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const sequelize = require('./utils/database');
 const userRouter = require('./routes/userRoutes');
+const hpRouter = require('./routes/homePageRoutes');
 
 
 app.use(cors({
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 
 app.use("/", userRouter);
 app.use('/user', userRouter);
+app.use('/homePage', hpRouter);
 
 sequelize
   .sync()
