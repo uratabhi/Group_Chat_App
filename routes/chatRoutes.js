@@ -5,6 +5,6 @@ const Authorization = require('../middleware/auth');
 
 
 router.post('/sendMessage', Authorization.authentication, chatController.messageStoreToDatabase);
-router.get('/getMessages', chatController.getAllChats);
+router.get('/getMessages/:messageId', chatController.getAllChats);
 
 module.exports = router;

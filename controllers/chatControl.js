@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
+const sequelize = require('sequelize');
+const {Op} = require('sequelize');
 
 
 
@@ -23,7 +25,11 @@ const messageStoreToDatabase = async (req, res, next)=>{
 
 const getAllChats = async (req, res, next)=>{
      try {
-        const messages = await Chat.findAll();
+      //   const messages = await Chat.findAll();
+        const identifier = req.params.messageId;
+        const messages = await Chat.findAll({
+           where :{id : {[Op.gt]:identifier}}
+        });
         return res.status(200).json({messages: messages});
      } catch (error) {
         console.log(error);
