@@ -16,11 +16,11 @@ const getMainPage = (req, res, next) => {
 
 const postUserSignUP = async (req, res, next) => {
   try {
-    const Name = req.body.userName;
-    const Email = req.body.userEmail;
-    const Phone = req.body.userPhone;
-    const Password = req.body.userPassword;
-    const user = await User.findOne({ where: { Email: Email } });
+    const name = req.body.userName;
+    const email = req.body.userEmail;
+    const phone = req.body.userPhone;
+    const password = req.body.userPassword;
+    const user = await User.findOne({ where: { email: email } });
     if (user) {
       res
         .status(403)
@@ -32,12 +32,12 @@ const postUserSignUP = async (req, res, next) => {
         );
     } else {
       const saltRounds = 10;
-      bcrypt.hash(Password, saltRounds, async (err, hash) => {
+      bcrypt.hash(password, saltRounds, async (err, hash) => {
         await User.create({
-          Name,
-          Email,
-          Phone,
-          Password: hash,
+          name: name,
+          email: email,
+          phone: phone,
+          password: hash,
         });
       });
      return res
@@ -55,12 +55,12 @@ const postUserSignUP = async (req, res, next) => {
 
 const postUserLogin = async (req, res, next) => {
   try {
-    const Email = req.body.loginEmail;
-    const Password = req.body.loginPassword;
+    const email = req.body.loginEmail;
+    const password = req.body.loginPassword;
 
-    const user = User.findOne({ where: { Email: Email } }).then((user) => {
+    const user = User.findOne({ where: { email: email } }).then((user) => {
       if (user) {
-        bcrypt.compare(Password, user.Password, (err, result) => {
+        bcrypt.compare(password, user.password, (err, result) => {
           if (err) {
             return res
               .status(500)
