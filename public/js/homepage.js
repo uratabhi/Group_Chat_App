@@ -3,18 +3,24 @@ const msgBtn = document.getElementById('msgBtn');
 const chathub = document.getElementById('chathub');
 const sidesection = document.getElementById('sidesection');
 const groupNameHeading = document.getElementById('groupNameHeading');
+const naming = document.getElementById('chatGroupName');
 
 msgBtn.addEventListener('click', messageSendApi);
 
 sidesection.addEventListener("click", activeGroup);
 
 async function activeGroup(e) {
-    chathub.innerHTML = "";
+   chathub.innerHTML = "";
+   naming.innerHTML = "";
     localStorage.setItem('chats',  JSON.stringify([]));
     if(e.target.classList.contains('active')){
-        groupName = e.target.innerHTML;
+        groupName = e.target.firstChild.textContent.trim();
+        const strong = document.createElement('strong');
+        strong.appendChild(document.createTextNode(groupName));
+        naming.appendChild(strong);
         localStorage.setItem('groupName', groupName);
     }
+
     
  }
 

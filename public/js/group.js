@@ -1,6 +1,9 @@
 const createGroupBtn = document.getElementById("createGroup");
 const addToGroupBtn = document.getElementById("addToGroup");
 const groups = document.getElementById("groups");
+const deleteFromGroupBtn = document.getElementById("delete");
+const groupMembersBtn = document.getElementById("groupMembers");
+const logoutBtn = document.getElementById("logout");
 
 async function createGroup() {
   try {
@@ -35,8 +38,6 @@ async function createGroup() {
 
 
 
-
-
 async function getGroups() {
   try {
     const token = localStorage.getItem("token");
@@ -55,7 +56,15 @@ async function getGroups() {
           div1.appendChild(main);
           let div2 = document.createElement('div');
           div2.className = "flex-grow-1 ml-3 active"
+          let div3 = document.createElement('div');
+          div3.classList.add('small');
+          const span = document.createElement('span');
+          span.className = " chat-online"
+          span.appendChild(document.createTextNode(`${group.admin} is the admin`));
+          div3.appendChild(span);
+          div1.className = "active";
           div2.appendChild(document.createTextNode(group.name));
+          div2.appendChild(div3);
           div1.appendChild(div2);
           a.appendChild(div1);
           sidesection.appendChild(a);
@@ -97,6 +106,64 @@ async function addToGroup() {
   }
 }
 
+async function deleteFromGroup(){
+    try {
+       const groupName = prompt("Group Name");
+       const members = [];
+       let userInput;
+       while (userInput !== "done") {
+         userInput = prompt(
+           `Enter the email Id of Users to Add! Please Enter Valid Email Id Otherwise User will not get Added. Type "done" when you finished!`
+         );
+         if (userInput !== "done") {
+           members.push(userInput);
+         }
+       }
+       const token = localStorage.getItem("token");
+       const res = await axios.post("http://localhost:3000/group/deleteFromGroup", 
+       {
+         groupName : groupName,
+         members : members,
+       },
+       {
+        headers: { Authorization: token },
+       });
+       alert(res.data.message);
+       window.location.reload();
+    } catch (error) {
+       console.log(error);
+    }
+}
+
+async function groupMembers(){
+   try {
+      const groupName = localStorage.getItem('groupName');
+      if (!groupName || groupName == "") {
+        return alert("Select the Group whose Members you wanna see!");
+      }
+      const token = localStorage.getItem('token');
+      if (!groupName || groupName == "") {
+      return alert("Select the Group whose Members you wanna see!");
+    }
+    const res = await axios.get(
+      `http://localhost:3000/group/groupMembers/${groupName}`,
+      { headers: { Authorization: token } }
+    );
+    console.log(res.data.users);
+   } catch (error) {
+      console.log(error);
+   }
+}
+
+
+async function logout(){
+  localStorage.clear();
+  window.location.href = "http://localhost:3000";
+}
+
+logoutBtn.addEventListener('click', logout);
+groupMembersBtn.addEventListener('click', groupMembers);
 createGroupBtn.addEventListener("click", createGroup);
+deleteFromGroupBtn.addEventListener('click', deleteFromGroup);
 addToGroupBtn.addEventListener("click", addToGroup);
 document.addEventListener("DOMContentLoaded", getGroups);

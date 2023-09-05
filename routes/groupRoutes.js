@@ -9,4 +9,8 @@ router.post("/addToGroup", Authorization.authentication, groupController.addToGr
 
 router.get("/getGroups", Authorization.authentication, groupController.getGroups);
 
+router.post('/deleteFromGroup', Authorization.authentication, groupController.deleteFromGroup);
+
+router.get('/groupMembers/:groupName', Authorization.authentication, groupController.groupMembers);
+
 module.exports = router;
