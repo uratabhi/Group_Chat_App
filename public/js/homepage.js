@@ -4,10 +4,12 @@ const chathub = document.getElementById('chathub');
 const sidesection = document.getElementById('sidesection');
 const groupNameHeading = document.getElementById('groupNameHeading');
 const naming = document.getElementById('chatGroupName');
+const socket = io("http://localhost:4000");
 
-msgBtn.addEventListener('click', messageSendApi);
+socket.on('data', (data)=>{
+    console.log(data);
+})
 
-sidesection.addEventListener("click", activeGroup);
 
 async function activeGroup(e) {
    chathub.innerHTML = "";
@@ -15,12 +17,12 @@ async function activeGroup(e) {
     localStorage.setItem('chats',  JSON.stringify([]));
     if(e.target.classList.contains('active')){
         groupName = e.target.firstChild.textContent.trim();
-        const strong = document.createElement('strong');
-        strong.appendChild(document.createTextNode(groupName));
-        naming.appendChild(strong);
+        const toBePut = document.createElement('h4');
+        toBePut.appendChild(document.createTextNode(groupName));
+        naming.appendChild(toBePut);
         localStorage.setItem('groupName', groupName);
     }
-
+   getChats();
     
  }
 
@@ -36,7 +38,7 @@ async function messageSendApi(e){
          }
          const res = await axios.post("http://localhost:3000/chat/sendmessage", {message : message, groupName : groupName},  { headers: { Authorization: token } })
          msgtextarea.value = "";
-         console.log(res.data.message);
+         getChats();
      } catch (error) {
         console.log('some error has occured.. Try after some time!!')
      }
@@ -53,85 +55,29 @@ function parseJwt (token) {
 }
 
 
-
-async function getMessagesApi(){
-   try {
+async function getChats(){
+    const token = localStorage.getItem("token");
+    const parsedToken = parseJwt(token);
+    const userId = parsedToken.userId;
     const groupName = localStorage.getItem("groupName");
     if (!groupName || groupName == "") {
       return alert("Select group to get the message");
     }
-      let storedChats = JSON.parse(localStorage.getItem('chats'));
-      if(storedChats && storedChats.length!==0){
-         param = storedChats[storedChats.length - 1].id;
-      }
-      else{
-         param = 0;
-      }
-           const res = await axios.get(`http://localhost:3000/chat/getMessages/?param=${param}&groupName=${groupName}`);
-           console.log(res.data.messages);
-           const token = localStorage.getItem("token");
-           const parsedToken = parseJwt(token);
-           const userId = parsedToken.userId;
-           res.data.messages.forEach(message =>{
-                storedChats.push(message);
-                if(storedChats.length>10){
-                  storedChats.shift();
-                }
-           })
-           localStorage.setItem('chats', JSON.stringify(storedChats));
-           res.data.messages.forEach((data)=>{
-                           if(userId===data.userId){
-                              const div1 = document.createElement("div");
-                              chathub.appendChild(div1);
-                              div1.className = "chat-message-right pb-4";
-                              const div2 = document.createElement("div");
-                              div1.appendChild(div2);
-                              div2.className = "flex-shrink-1 bg-light rounded py-2 px-3 mr-3"
-                              const div3 = document.createElement('div');
-                              div2.appendChild(div3);
-                              div3.className = "font-weight-bold mb-1";
-                              div3.appendChild(document.createTextNode('You'));
-                              div2.appendChild(document.createTextNode(data.message));
-                           }
-                           else{
-                             const div1 = document.createElement("div");
-                             chathub.appendChild(div1);
-                             div1.className = "chat-message-left pb-4";
-                             const div2 = document.createElement("div");
-                             div1.appendChild(div2);
-                             div2.className = "flex-shrink-1 bg-light rounded py-2 px-3 ml-3"
-                             const div3 = document.createElement('div');
-                             div2.appendChild(div3);
-                             div3.className = "font-weight-bold mb-1";
-                             div3.appendChild(document.createTextNode(data.name));
-                             div2.appendChild(document.createTextNode(data.message));
-                           }
-                       })
-   } catch (error) {
-     console.log('some error has happene');
-   }
-}
-
-
-
-async function getMessagesFromLocalStorage(){
-    const messages = JSON.parse(localStorage.getItem('chats'));
-    const token = localStorage.getItem("token");
-    const parsedToken = parseJwt(token);
-    const userId = parsedToken.userId;
+    socket.emit('getMessages', groupName);
+    socket.on('messages', (messages)=>{
+      console.log(messages);
     chathub.innerHTML = "";
-    if(messages){
          messages.forEach((data)=>{
             if(userId===data.userId){
                 const div1 = document.createElement("div");
-                chathub.appendChild(div1);
                 div1.className = "chat-message-right pb-4";
+                chathub.appendChild(div1);
                 const div2 = document.createElement("div");
                 div1.appendChild(div2);
-                div2.className = "flex-shrink-1 bg-light rounded py-2 px-3 mr-3"
+                div2.className = "flex-shrink-1 bg-light rounded py-2 px-3 mr-3";
                 const div3 = document.createElement('div');
                 div2.appendChild(div3);
-                div3.className = "font-weight-bold mb-1";
+                div3.className = "font-weight-bold mb-1 ";
                 div3.appendChild(document.createTextNode('You'));
                 div2.appendChild(document.createTextNode(data.message));
              }
@@ -149,17 +95,16 @@ async function getMessagesFromLocalStorage(){
                div2.appendChild(document.createTextNode(data.message));
              }
          });
-    }
+    });
 
 }
-// setInterval(() => {
-//   getMessagesApi();
-// }, 5000);
 
 
-document.addEventListener('DOMContentLoaded', getMessagesApi);
-document.addEventListener('DOMContentLoaded', getMessagesFromLocalStorage);
+msgBtn.addEventListener('click', messageSendApi);
+sidesection.addEventListener("click", activeGroup);
+document.addEventListener('DOMContentLoaded', getChats);
 document.addEventListener("DOMContentLoaded", () => {
   localStorage.setItem("groupName", "");
+  chathub.innerHTML = "";
   localStorage.setItem("chats", JSON.stringify([]));
 });

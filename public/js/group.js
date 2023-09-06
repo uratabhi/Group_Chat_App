@@ -4,6 +4,7 @@ const groups = document.getElementById("groups");
 const deleteFromGroupBtn = document.getElementById("delete");
 const groupMembersBtn = document.getElementById("groupMembers");
 const logoutBtn = document.getElementById("logout");
+//const chathub = document.getElementById('chathub');
 
 async function createGroup() {
   try {
@@ -51,10 +52,7 @@ async function getGroups() {
           a.className = "list-group-item list-group-item-action border-0";
           let div1 = document.createElement('div');
           div1.className = "d-flex align-items-start";
-          let main = document.createElement('div');
-          main.className = "fa fa-group rounded-circle mr-1";
-          div1.appendChild(main);
-          let div2 = document.createElement('div');
+          let div2 = document.createElement('h5');
           div2.className = "flex-grow-1 ml-3 active"
           let div3 = document.createElement('div');
           div3.classList.add('small');
@@ -68,6 +66,8 @@ async function getGroups() {
           div1.appendChild(div2);
           a.appendChild(div1);
           sidesection.appendChild(a);
+          let hr  = document.createElement('hr');
+          sidesection.appendChild(hr);
 
     })
   } catch (error) {
@@ -138,18 +138,27 @@ async function deleteFromGroup(){
 async function groupMembers(){
    try {
       const groupName = localStorage.getItem('groupName');
+      const token = localStorage.getItem('token');
       if (!groupName || groupName == "") {
         return alert("Select the Group whose Members you wanna see!");
       }
-      const token = localStorage.getItem('token');
-      if (!groupName || groupName == "") {
-      return alert("Select the Group whose Members you wanna see!");
-    }
     const res = await axios.get(
       `http://localhost:3000/group/groupMembers/${groupName}`,
       { headers: { Authorization: token } }
     );
+    res.data.users.shift();
     console.log(res.data.users);
+    res.data.users.forEach((user) => {
+      const div = document.createElement("div");
+      div.classList.add(
+        "d-flex",
+        "justify-content-center",
+      );
+      const p = document.createElement("p");
+      p.appendChild(document.createTextNode(`${user.name} is Member`));
+      div.appendChild(p);
+      chathub.appendChild(div);
+    });
    } catch (error) {
       console.log(error);
    }
