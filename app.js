@@ -21,8 +21,13 @@ app.use(cors({
    origin: "*",
 }));
 dotenv.config();
+console.log('DB_NAME:', process.env.DB_NAME);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.json());
 
 app.use("/", userRouter);
@@ -35,11 +40,13 @@ User.hasMany(Chat,{constraints:true,onDelete:'CASCADE'});
 Chat.belongsTo(User);
 
 
+
 User.hasMany(UserGroup);
 UserGroup.belongsTo(User);
 
 Group.hasMany(Chat);
 Chat.belongsTo(Group);
+
 
 
 Group.hasMany(UserGroup);

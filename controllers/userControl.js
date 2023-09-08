@@ -2,6 +2,9 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require("../models/userModel");
+const Chat = require("../models/chatModel");
+const s3Service = require("../services/s3services");
+const Group = require('../models/groupModel');
 
 
 const generateAccessToken = (id, Email) => {
@@ -92,6 +95,27 @@ const postUserLogin = async (req, res, next) => {
 };
 
 
+const postMulitmedia = async (req, res, next)=>{
+        try {
+           console.log('I am in postMulitmedia');
+           const fileUrl=await s3Service.uploadToS3(req.body.fileData.data,req.body.fileData.name);
+           const group = await Group.findOne({
+            where : {name : req.body.groupName},
+         });
+ 
+ 
+ 
+          await Chat.create({
+              message : fileUrl,
+              userId : req.user.id,
+              name : req.user.name,
+              groupId : group.dataValues.id,
+          })
+          return res.status(200).json({message: 'success'});
+        } catch (error) {
+           console.log(error);
+        }
+}
 
 
 
@@ -104,7 +128,6 @@ const postUserLogin = async (req, res, next) => {
 
 
 
-
-module.exports ={getMainPage, postUserSignUP, postUserLogin};
+module.exports ={getMainPage, postUserSignUP, postUserLogin, postMulitmedia};
 
 
