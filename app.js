@@ -53,9 +53,12 @@ Group.hasMany(UserGroup);
 
 UserGroup.belongsTo(Group);
 
+const job = require("./jobs/cron");
+job.start();
+
 sequelize
-  .sync()
-  //.sync({force : true})
+  //.sync()
+  .sync({force : true})
   .then((result) => {
     app.listen(3000);
   })

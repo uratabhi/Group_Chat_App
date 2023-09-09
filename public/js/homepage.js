@@ -75,7 +75,7 @@ async function getChats() {
   }
   socket.emit("getMessages", groupName);
   socket.on("messages", (messages) => {
-    //console.log(messages);
+    console.log(messages);
     chathub.innerHTML = "";
     messages.forEach((data) => {
       if (userId === data.userId) {
@@ -90,10 +90,11 @@ async function getChats() {
           div2.appendChild(div3);
           div3.className = "font-weight-bold mb-1 ";
           const a = document.createElement("a");
-          a.setAttribute("href", data.fileurl);
+          a.setAttribute("href", data.message);
           a.appendChild(document.createTextNode("Media File"));
           div3.appendChild(document.createTextNode("You"));
           div2.appendChild(a);
+          console.log(data.fileurl);
         } else {
           const div1 = document.createElement("div");
           div1.className = "chat-message-right pb-4";
@@ -119,7 +120,7 @@ async function getChats() {
                        div2.appendChild(div3);
                        div3.className = "font-weight-bold mb-1";
                        const a = document.createElement("a");
-                       a.setAttribute("href", data.fileurl);
+                       a.setAttribute("href", data.message);
                        a.appendChild(document.createTextNode('Media File'));
                        div3.appendChild(document.createTextNode(data.name));
                        div2.appendChild(a);
@@ -171,7 +172,7 @@ async function sendMulitmedia() {
         { fileData, groupName },
         { headers: { Authorization: token } }
       );
-
+       
       getChats();
     }
   } catch (error) {
